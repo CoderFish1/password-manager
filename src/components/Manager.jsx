@@ -1,9 +1,18 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const Manager = () => {
+
+ const passwordRef = useRef();
+
+
   const showPassword = () => {
-    alert("password is showing !");
+    if(passwordRef.current.type = "password"){
+      passwordRef.current.type = "text"
+    }
+    else if(passwordRef.current.type = "text"){
+      passwordRef.current.type = "password"
+    }
   };
 
   const [form, setform] = useState({ site: "", username: "", password: "" });
@@ -27,13 +36,14 @@ const Manager = () => {
   };
 
   return (
-    <>
+    <div className="relative">
       <div className="absolute top-0 -z-10 h-full w-full bg-white">
         <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full bg-[rgba(173,109,244,0.5)] opacity-50 blur-[80px]"></div>
       </div>
+
       <div className="container  flex justify-center flex-col items-center gap-5 mt-20">
         <div className="heading text-center">
-          <h1 className="font-bold text-2xl">Password Manager</h1>
+          <h1 className="font-bold text-4xl font-bitcount">Password Manager</h1>
           <p className="text-[1.4vw]">
             Relax
             <span className="font-semibold text-blue-600"> PassVault</span> is
@@ -63,13 +73,14 @@ const Manager = () => {
             <div className="pass relative">
               <input
                 value={form.password}
+                ref={passwordRef}
                 onChange={handleChange}
                 className="bg-amber-50 m-3 p-1.5 2-30  rounded-l-2xl rounded-r-2xl"
-                type="text"
+                type="password"
                 name="password"
                 placeholder="Enter Password"
               />
-              <lord-icon
+              <lord-icon 
                 src="https://cdn.lordicon.com/dicvhxpz.json"
                 trigger="hover"
                 className="absolute right-3.5 top-3.5 cursor-pointer"
@@ -110,7 +121,7 @@ const Manager = () => {
                     <tbody key={index}>
                       <tr>
                         <td class="w-[25vw] px-4 py-2">
-                          <a href="{item.site}" target="_blank">
+                          <a href={item.site} target="_blank">
                             {item.site}
                           </a>
                         </td>
@@ -125,7 +136,8 @@ const Manager = () => {
           )}
         </div>
       </div>
-    </>
+      <div className="footer font-cedarville fixed text-xl bottom-2">Created by <span className="font-bold">Shrey</span> with 💻 </div>
+    </div>
   );
 };
 
