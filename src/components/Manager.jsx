@@ -1,17 +1,31 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { v4 as uuidv4 } from "uuid";
 
 const Manager = () => {
+  const passwordRef = useRef();
 
- const passwordRef = useRef();
-
-
+  const copyText = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.info("Copied to ClipBoard!", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+    });
+  };
   const showPassword = () => {
-    if(passwordRef.current.type = "password"){
-      passwordRef.current.type = "text"
-    }
-    else if(passwordRef.current.type = "text"){
-      passwordRef.current.type = "password"
+    if (passwordRef.current.type === "password") {
+      passwordRef.current.type = "text";
+    } else if (passwordRef.current.type === "text") {
+      passwordRef.current.type = "password";
     }
   };
 
@@ -30,13 +44,46 @@ const Manager = () => {
   };
 
   const savePassword = () => {
-    setPasswordArray([...passwordArray, form]);
-    localStorage.setItem("passwords", JSON.stringify([...passwordArray, form]));
-    console.log([...passwordArray, form]);
+    const newPassword = { ...form, id: uuidv4() };
+    setPasswordArray([...passwordArray, newPassword]);
+    localStorage.setItem(
+      "passwords",
+      JSON.stringify([...passwordArray, newPassword])
+    );
+    console.log([...passwordArray, newPassword]);
+    setform({ site: "", username: "", password: "" })
+  };
+
+  const editPassword = (id) => {
+    alert("editing password");
+    setform(passwordArray.filter(i=>i.id===id)[0])
+    setPasswordArray(passwordArray.filter((i) => i.id !== id));
+  };
+  const deletePassword = (id) => {
+    setPasswordArray(passwordArray.filter((i) => i.id !== id));
+    localStorage.setItem(
+      "passwords",
+      JSON.stringify(passwordArray.filter((i) => i.id !== id))
+    );
+    console.log("deleting password with id", id);
   };
 
   return (
     <div className="relative">
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
+
       <div className="absolute top-0 -z-10 h-full w-full bg-white">
         <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full bg-[rgba(173,109,244,0.5)] opacity-50 blur-[80px]"></div>
       </div>
@@ -75,16 +122,16 @@ const Manager = () => {
                 value={form.password}
                 ref={passwordRef}
                 onChange={handleChange}
-                className="bg-amber-50 m-3 p-1.5 2-30  rounded-l-2xl rounded-r-2xl"
+                className="bg-amber-50 m-3 p-1.5 rounded-l-2xl rounded-r-2xl"
                 type="password"
                 name="password"
                 placeholder="Enter Password"
               />
-              <lord-icon 
+              <lord-icon
                 src="https://cdn.lordicon.com/dicvhxpz.json"
                 trigger="hover"
                 className="absolute right-3.5 top-3.5 cursor-pointer"
-                onclick={showPassword}
+                onClick={showPassword}
               ></lord-icon>
             </div>
           </div>
@@ -107,26 +154,68 @@ const Manager = () => {
             <div className="text-center font-mono">No Passwords added !!!</div>
           )}
           {passwordArray.length != 0 && (
-            <div class="overflow-x-auto">
-              <table class="w-full text-left table-auto">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left table-auto">
                 <thead>
-                  <tr class="bg-gray-100">
-                    <th class="px-4 py-2">Site URL</th>
-                    <th class="px-4 py-2">Username</th>
-                    <th class="px-4 py-2">Password</th>
+                  <tr className="bg-gray-100">
+                    <th className="px-4 py-2">Site URL</th>
+                    <th className="px-4 py-2">Username</th>
+                    <th className="px-4 py-2">Password</th>
+                    <th className="px-4 py-2">Actions</th>
                   </tr>
                 </thead>
                 {passwordArray.map((item, index) => {
                   return (
                     <tbody key={index}>
                       <tr>
-                        <td class="w-[25vw] px-4 py-2">
+                        <td className="w-[25vw] px-4 py-2">
                           <a href={item.site} target="_blank">
                             {item.site}
                           </a>
+                          &nbsp;
+                          <i
+                            onClick={() => {
+                              copyText(item.site);
+                            }}
+                            className="ri-file-copy-line"
+                          ></i>
                         </td>
-                        <td class=" w-[20vw] px-4 py-2">{item.username}</td>
-                        <td class=" w-[15vw] px-4 py-2">{item.password}</td>
+                        <td className=" w-[20vw] px-4 py-2">
+                          {item.username}
+                          &nbsp;
+                          <i
+                            onClick={() => {
+                              copyText(item.username);
+                            }}
+                            className="ri-file-copy-line"
+                          ></i>
+                        </td>
+                        <td className=" w-[15vw] px-4 py-2">
+                          {item.password}
+                          &nbsp;
+                          <i
+                            onClick={() => {
+                              copyText(item.password);
+                            }}
+                            className="ri-file-copy-line"
+                          ></i>
+                        </td>
+                        <td className=" w-[15vw] px-4 py-2">
+                          &nbsp;
+                          <i
+                            onClick={() => {
+                              editPassword(item.id);
+                            }}
+                            class="ri-pencil-line"
+                          ></i>
+                          &nbsp;&nbsp;
+                          <i
+                            onClick={() => {
+                              deletePassword(item.id);
+                            }}
+                            class="ri-delete-bin-line"
+                          ></i>
+                        </td>
                       </tr>
                     </tbody>
                   );
@@ -136,7 +225,9 @@ const Manager = () => {
           )}
         </div>
       </div>
-      <div className="footer font-cedarville fixed text-xl bottom-2">Created by <span className="font-bold">Shrey</span> with 💻 </div>
+      <div className="footer font-cedarville fixed text-xl bottom-1.5 right-0">
+        Created by <span className="font-bold">Shrey</span> with 💻
+      </div>
     </div>
   );
 };
