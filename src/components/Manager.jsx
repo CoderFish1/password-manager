@@ -11,7 +11,7 @@ const Manager = () => {
     navigator.clipboard.writeText(text);
     toast.info("Copied to ClipBoard!", {
       position: "top-center",
-      autoClose: 5000,
+      autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: false,
       pauseOnHover: true,
@@ -44,7 +44,8 @@ const Manager = () => {
   };
 
   const savePassword = () => {
-    const newPassword = { ...form, id: uuidv4() };
+     if (form.site.length>3 && form.username.length>3 && form.password.length>3) {
+      const newPassword = { ...form, id: uuidv4() };
     setPasswordArray([...passwordArray, newPassword]);
     localStorage.setItem(
       "passwords",
@@ -52,27 +53,56 @@ const Manager = () => {
     );
     console.log([...passwordArray, newPassword]);
     setform({ site: "", username: "", password: "" })
+    toast.info("Password saved!", {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+    });
+     }
+     else{
+      toast('ERROR : Password not saved ! ');
+     }
+    
   };
 
   const editPassword = (id) => {
-    alert("editing password");
     setform(passwordArray.filter(i=>i.id===id)[0])
     setPasswordArray(passwordArray.filter((i) => i.id !== id));
   };
   const deletePassword = (id) => {
-    setPasswordArray(passwordArray.filter((i) => i.id !== id));
+    let c = confirm("Do you want to really delete the Password?");
+    if (c) {
+      setPasswordArray(passwordArray.filter((i) => i.id !== id));
     localStorage.setItem(
       "passwords",
       JSON.stringify(passwordArray.filter((i) => i.id !== id))
     );
     console.log("deleting password with id", id);
+    toast.info("Password Deleted!", {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Bounce,
+    });
+    }
   };
 
   return (
-    <div className="relative">
+    <div className="relative flex justify-center items-center overflow-x-hidden">
       <ToastContainer
         position="top-center"
-        autoClose={5000}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick={false}
@@ -84,36 +114,38 @@ const Manager = () => {
         transition={Bounce}
       />
 
-      <div className="absolute top-0 -z-10 h-full w-full bg-white">
-        <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full bg-[rgba(173,109,244,0.5)] opacity-50 blur-[80px]"></div>
+      <div className="absolute top-0 -z-10 h-full w-full bg-[rgba(173,109,244,0.5)">
+        <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full bg-[rgba(173,109,244,0.5)] opacity-50 blur-[80px] "></div>
       </div>
 
       <div className="container  flex justify-center flex-col items-center gap-5 mt-20">
         <div className="heading text-center">
-          <h1 className="font-bold text-4xl font-bitcount">Password Manager</h1>
-          <p className="text-[1.4vw]">
+          <h1 className="font-bold text-4xl font-bitcount lg:text-5xl">Password Manager</h1>
+          <p className="md:text-[1.4vw] font-anton text-[3.5vw]">
             Relax
             <span className="font-semibold text-blue-600"> PassVault</span> is
             here to manage to your Passwords
           </p>
         </div>
-        <div className="inputs p-6">
+        <div className="inputs p-6 flex flex-col items-center">
           <input
             value={form.site}
             onChange={handleChange}
-            className="bg-blue-400 w-135 m-4 p-2 rounded-bl-2xl rounded-br-2xl"
+            className="bg-blue-400 w-90 md:w-135 m-4 p-2 rounded-bl-2xl rounded-br-2xl"
             type="text"
             name="site"
+            id="site"
             placeholder="Enter Website URL"
           />
-          <div className="credentials flex">
+          <div className="credentials flex flex-wrap">
             <div className="username">
               <input
                 value={form.username}
                 onChange={handleChange}
-                className="bg-amber-50 m-3 p-1.5 w-82 rounded-l-2xl rounded-r-2xl"
+                className="bg-amber-50 p-1.5 md:w-82 w-70 m-4 rounded-l-2xl rounded-r-2xl"
                 type="text"
                 name="username"
+                id="username"
                 placeholder="Enter Username"
               />
             </div>
@@ -122,15 +154,16 @@ const Manager = () => {
                 value={form.password}
                 ref={passwordRef}
                 onChange={handleChange}
-                className="bg-amber-50 m-3 p-1.5 rounded-l-2xl rounded-r-2xl"
+                className="bg-amber-50 m-4 p-1.5 rounded-l-2xl rounded-r-2xl "
                 type="password"
                 name="password"
+                id="password"
                 placeholder="Enter Password"
               />
               <lord-icon
                 src="https://cdn.lordicon.com/dicvhxpz.json"
                 trigger="hover"
-                className="absolute right-3.5 top-3.5 cursor-pointer"
+                className="absolute right-4.5 top-4.5 cursor-pointer"
                 onClick={showPassword}
               ></lord-icon>
             </div>
@@ -145,17 +178,17 @@ const Manager = () => {
             trigger="hover"
             className="absolute left-0 top-2"
           ></lord-icon>
-          <span className="font-medium">Add Password</span>
+          <span className="font-medium">&nbsp;Save Details</span>
         </button>
 
         <div className="viewPassword">
-          <h1 className="text-[1.5vw] font-semibold py-2">Your Passwords</h1>
+          <h1 className="md:text-[1.5vw] font-semibold py-2 md:mx-0 mx-5">Your Passwords</h1>
           {passwordArray.length === 0 && (
-            <div className="text-center font-mono">No Passwords added !!!</div>
+            <div className="text-center font-mono pb-38 md:pb-12">No Passwords added !!!</div>
           )}
           {passwordArray.length != 0 && (
             <div className="overflow-x-auto">
-              <table className="w-full text-left table-auto">
+              <table className=":w-full text-left table-auto">
                 <thead>
                   <tr className="bg-gray-100">
                     <th className="px-4 py-2">Site URL</th>
@@ -223,9 +256,11 @@ const Manager = () => {
               </table>
             </div>
           )}
+
         </div>
       </div>
-      <div className="footer font-cedarville fixed text-xl bottom-1.5 right-0">
+      <div class="footer font-cedarville fixed text-xl top-16  md:top-auto md:bottom-1.5 md:right-0 md:fixed lg:fixed">
+
         Created by <span className="font-bold">Shrey</span> with 💻
       </div>
     </div>
