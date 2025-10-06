@@ -224,7 +224,7 @@ const Manager = () => {
                           ></i>
                         </td>
                         <td className=" w-[15vw] px-4 py-2">
-                          {item.password}
+                          {"*".repeat(item.password.length)}
                           &nbsp;
                           <i
                             onClick={() => {
